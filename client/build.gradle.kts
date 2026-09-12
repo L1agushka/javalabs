@@ -10,9 +10,11 @@ javafx {
 
 dependencies {
     implementation(project(":core"))
-
-    // Jackson для связи и парсинга DTO
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
+}
+
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 application {
