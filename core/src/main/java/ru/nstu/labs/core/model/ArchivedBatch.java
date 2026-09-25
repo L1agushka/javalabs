@@ -1,3 +1,5 @@
+//Благодаря этому механизму, объект ArchivedBatch можно создать и заполнить данными при чтении из CSV-файла
+
 package ru.nstu.labs.core.model;
 
 import java.time.LocalDate;

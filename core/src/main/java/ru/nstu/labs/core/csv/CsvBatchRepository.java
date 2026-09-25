@@ -1,3 +1,7 @@
+//Класс CsvBatchRepository выполняет роль слоя доступа к данным, отвечая за чтение,
+//  парсинг, валидацию и сохранение складских партий в формате CSV
+
+
 package ru.nstu.labs.core.csv;
 
 import java.io.BufferedReader;
@@ -18,6 +22,10 @@ import ru.nstu.labs.core.model.ImportedBatch;
 
 public class CsvBatchRepository {
 
+
+
+  //Использование record позволяет вернуть из метода load сразу два списка:
+  //успешно загруженные объекты и перечень ошибок
   public record LoadResult(List<Batch> items, List<CsvParseException> errors) {}
 
   private static final String HEADER =
@@ -34,6 +42,11 @@ public class CsvBatchRepository {
         return new LoadResult(items, errors);
       }
 
+
+
+      //Здесь реализовано требование - Битые строки пропускаются
+      // Если метод parseLine выбрасывает исключение, программа не падает
+      // Ошибка перехватывается, записывается в коллекцию errors, а цикл продолжает читать следующую строку
       int lineNumber = 1;
       while ((line = reader.readLine()) != null) {
         lineNumber++;
@@ -64,6 +77,10 @@ public class CsvBatchRepository {
     }
   }
 
+
+  //Используется split(";", -1), чтобы пустые значения в конце строки
+  // (например, ;;) не отбрасывались, и массив всегда имел нужную длину. 
+  // Бросается собственное исключение с кодом WRONG_FIELD_COUNT
   private Batch parseLine(String line, int lineNumber) throws CsvParseException {
     String[] parts = line.split(";", -1);
     if (parts.length < 8) {
@@ -83,6 +100,9 @@ public class CsvBatchRepository {
     String country = parts[6].trim();
     String customsCode = parts[7].trim();
 
+
+
+    //Это позволит в GUI показать пользователю, в какой именно строке и колонке он ошибся.
     int quantity;
     try {
       quantity = Integer.parseInt(quantityStr);
@@ -138,6 +158,12 @@ public class CsvBatchRepository {
           "",
           "");
     }
+
+
+    //проверяет реальный тип объекта.
+    //  Если это импортная партия, в строку дописываются специфичные поля (страна и код). 
+    // Для базовой и архивной партий на месте этих колонок ставятся пустые строки "",
+    //  чтобы сохранить единую структуру файла из 8 колонок.
     if (batch instanceof ImportedBatch imported) {
       return String.join(
           ";",
