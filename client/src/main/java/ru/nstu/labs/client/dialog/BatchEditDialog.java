@@ -1,12 +1,12 @@
 package ru.nstu.labs.client.dialog;
-
+// модальное диалоговое окно на джаваfx добавление новой партии или редактирование существующей
 import java.time.LocalDate;
 import java.util.List;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.ComboBox;  
+import javafx.scene.control.DatePicker; // поля графических компонентов 
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -25,7 +25,7 @@ public class BatchEditDialog extends Dialog<Batch> {
   private final TextField countryField = new TextField();
   private final TextField customsCodeField = new TextField();
 
-  public BatchEditDialog(Batch existing) {
+  public BatchEditDialog(Batch existing) { // конструктор принимает параметр Batch existing если передан нул диалог открывается в режиме создания, если обьект - редактирования
     setTitle(existing == null ? "Добавление партии" : "Редактирование партии");
     setHeaderText(
         existing == null ? "Введите параметры новой партии" : "Измените параметры партии");
@@ -34,10 +34,10 @@ public class BatchEditDialog extends Dialog<Batch> {
     getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
 
     GridPane grid = new GridPane();
-    grid.setHgap(10);
+    grid.setHgap(10); // компоновка кнопок
     grid.setVgap(10);
     grid.setPadding(new Insets(20, 150, 10, 10));
-
+// управление полями ввода если выбрана импортная партия поля страна и таможенный код разблокируются
     typeBox.getItems().addAll("Базовая партия", "Импортная партия");
     typeBox.setValue("Базовая партия");
 
@@ -67,17 +67,17 @@ public class BatchEditDialog extends Dialog<Batch> {
     grid.add(countryField, 1, 6);
     grid.add(new Label("Таможенный код:"), 0, 7);
     grid.add(customsCodeField, 1, 7);
-
+// предзаполнение формы в режиме редактирования
     if (existing != null) {
-      typeBox.setDisable(true);
+      typeBox.setDisable(true); // запрещает менять тип уже сущ. партии
       skuField.setText(existing.getSku());
-      skuField.setDisable(true);
+      skuField.setDisable(true); // артикул блокируется от изменения тк он выступает уникальным идентификатором партии в equals и hashCode
       nameField.setText(existing.getName());
       quantityField.setText(String.valueOf(existing.getQuantity()));
       cellField.setText(existing.getCell());
       datePicker.setValue(existing.getDeliveryDate());
 
-      if (existing instanceof ImportedBatch imported) {
+      if (existing instanceof ImportedBatch imported) { // одновременно проверяет тип и обьявляет типизированную переменную imported без явного приведения (ImportedBatch) existing. Если партия импортная заполняются поля страны и таможенного кода.
         typeBox.setValue("Импортная партия");
         countryField.setDisable(false);
         customsCodeField.setDisable(false);
@@ -88,16 +88,16 @@ public class BatchEditDialog extends Dialog<Batch> {
 
     getDialogPane().setContent(grid);
 
-    setResultConverter(
+    setResultConverter( // преобразование результата и валидация 
         dialogButton -> {
-          if (dialogButton == saveButtonType) {
+          if (dialogButton == saveButtonType) { // нажата кнопка сохранить строка кол-ва парсится в инт при нечисловом приравнивается к нулю 
             int qty = 0;
             try {
               qty = Integer.parseInt(quantityField.getText().trim());
             } catch (NumberFormatException ignored) {
             }
 
-            Batch batch;
+            Batch batch; // В зависимости от значения typeBox вызывается конструктор ImportedBatch или Batch
             if ("Импортная партия".equals(typeBox.getValue())) {
               batch =
                   new ImportedBatch(
@@ -118,7 +118,7 @@ public class BatchEditDialog extends Dialog<Batch> {
                       datePicker.getValue());
             }
 
-            List<String> errors = batch.validate();
+            List<String> errors = batch.validate(); // валидация на пустые строки итд
             if (!errors.isEmpty()) {
               return null;
             }
