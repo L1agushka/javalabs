@@ -8,3 +8,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
+tasks.register<JavaExec>("runBenchmark") {
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("ru.nstu.labs.core.benchmark.BenchmarkRunner")
+}
