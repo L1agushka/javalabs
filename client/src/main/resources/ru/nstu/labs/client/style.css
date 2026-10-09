@@ -1,167 +1,189 @@
-﻿/* Базовый фон окна и шрифт */
 .root {
-    -fx-base: #121214;
+    -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    -fx-font-size: 13.5px;
     -fx-background-color: #121214;
-    -fx-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    -fx-font-size: 13px;
 }
 
-/* Таблица */
+/* Таблица и просторный масштаб строк */
 .table-view {
-    -fx-background-color: #18181b;
+    -fx-background-color: #16161a;
     -fx-border-color: #27272a;
-    -fx-border-width: 1px;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-    -fx-padding: 0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
 }
 
-/* Убираем белые зазоры в шапке таблицы */
-.table-view .column-header-background,
-.table-view .column-header-background .filler,
-.table-view .filler {
-    -fx-background-color: #1e1e24;
-    -fx-border-color: transparent transparent #27272a transparent;
-    -fx-border-width: 1px;
+.table-view .column-header-background {
+    -fx-background-color: #1a1a1f;
 }
 
-.table-view .column-header {
+.table-view .column-header, .table-view .filler {
     -fx-background-color: transparent;
-    -fx-border-color: transparent #27272a transparent transparent;
-    -fx-border-width: 1px;
-    -fx-padding: 10px 12px;
+    -fx-border-color: transparent #27272a #27272a transparent;
+    -fx-border-width: 0 1 1 0;
+    -fx-size: 42px;
 }
 
 .table-view .column-header .label {
-    -fx-text-fill: #e4e4e7;
+    -fx-text-fill: #a1a1aa;
     -fx-font-weight: bold;
-    -fx-font-size: 12px;
+    -fx-font-size: 12.5px;
+    -fx-alignment: CENTER_LEFT;
 }
 
-.table-view .placeholder .label {
-    -fx-text-fill: #71717a;
-}
-
-/* Строки таблицы */
 .table-row-cell {
-    -fx-background-color: #18181b;
-    -fx-border-color: transparent transparent #202024 transparent;
-    -fx-border-width: 1px;
+    -fx-background-color: #16161a;
+    -fx-cell-size: 38px;
+    -fx-border-color: transparent transparent #202026 transparent;
+    -fx-border-width: 0 0 1 0;
 }
 
 .table-row-cell:odd {
-    -fx-background-color: #141416;
+    -fx-background-color: #19191e;
 }
 
-.table-row-cell:filled:hover {
-    -fx-background-color: #23232a;
+.table-row-cell:hover {
+    -fx-background-color: #27231f;
 }
 
-.table-row-cell:filled:selected {
-    -fx-background-color: #2d1e12;
-    -fx-border-color: transparent transparent #ff7900 transparent;
+.table-row-cell:selected {
+    -fx-background-color: #3d2615;
+    -fx-background-insets: 0;
 }
 
 .table-cell {
-    -fx-text-fill: #d4d4d8;
-    -fx-padding: 9px 12px;
-    -fx-alignment: CENTER-LEFT;
-}
-
-/* Нижняя панель действий */
-.bottom-bar {
-    -fx-background-color: #18181b;
-    -fx-border-color: #27272a transparent transparent transparent;
-    -fx-border-width: 1px;
-    -fx-border-radius: 0 0 8px 8px;
-    -fx-background-radius: 0 0 8px 8px;
-    -fx-padding: 14px 18px;
+    -fx-text-fill: #f4f4f5;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 10 0 10;
 }
 
 /* Кнопки */
 .button {
     -fx-background-color: #27272a;
     -fx-text-fill: #e4e4e7;
-    -fx-font-weight: 600;
-    -fx-padding: 8px 18px;
-    -fx-background-radius: 6px;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-background-radius: 6;
+    -fx-padding: 9 18 9 18;
     -fx-cursor: hand;
-    -fx-border-color: #3f3f46;
-    -fx-border-radius: 6px;
-    -fx-border-width: 1px;
 }
 
 .button:hover {
     -fx-background-color: #3f3f46;
-    -fx-text-fill: #ffffff;
 }
 
-.button:pressed {
-    -fx-background-color: #52525b;
-}
-
-.button:disabled {
-    -fx-opacity: 0.35;
-}
-
-/* Сочный цитрусовый акцент */
 .btn-citrus {
-    -fx-background-color: #ff7900;
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #ff9100;
+    -fx-background-color: #ea580c;
+    -fx-text-fill: white;
 }
-
 .btn-citrus:hover {
-    -fx-background-color: #ff8c1a;
+    -fx-background-color: #f97316;
 }
 
-.btn-citrus:pressed {
-    -fx-background-color: #e66d00;
-}
-
-/* Янтарная кнопка изменения */
 .btn-amber {
     -fx-background-color: #d97706;
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #f59e0b;
+    -fx-text-fill: white;
 }
-
 .btn-amber:hover {
     -fx-background-color: #f59e0b;
 }
 
-.btn-amber:pressed {
-    -fx-background-color: #b45309;
+.bottom-bar {
+    -fx-background-color: #16161a;
+    -fx-border-color: #27272a;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 12 16 12 16;
 }
 
-/* Бейджи типов */
+/* Бейджи в единой теплой палитре без кислотных оттенков */
 .badge {
-    -fx-padding: 3px 10px;
-    -fx-background-radius: 6px;
-    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
     -fx-font-size: 11px;
+    -fx-font-weight: bold;
 }
 
+/* БАЗОВАЯ — спокойный матовый графит */
 .badge-base {
-    -fx-background-color: #2d1e12;
-    -fx-text-fill: #ff9f43;
-    -fx-border-color: #593315;
-    -fx-border-radius: 6px;
-    -fx-border-width: 1px;
-}
-
-.badge-imported {
-    -fx-background-color: #172822;
-    -fx-text-fill: #2ed573;
-    -fx-border-color: #1e4d3a;
-    -fx-border-radius: 6px;
-    -fx-border-width: 1px;
-}
-
-.badge-archived {
-    -fx-background-color: #26262a;
-    -fx-text-fill: #a1a1aa;
+    -fx-background-color: #242429;
     -fx-border-color: #3f3f46;
-    -fx-border-radius: 6px;
-    -fx-border-width: 1px;
+    -fx-text-fill: #e4e4e7;
+}
+
+/* ИМПОРТ — глубокий теплый янтарь под цвет темы */
+.badge-imported {
+    -fx-background-color: #382012;
+    -fx-border-color: #7c2d12;
+    -fx-text-fill: #fb923c;
+}
+
+/* АРХИВ — приглушенный нейтральный пепел */
+.badge-archived {
+    -fx-background-color: #1c1917;
+    -fx-border-color: #292524;
+    -fx-text-fill: #78716c;
+}
+
+/* ScrollPane и убирание артефактов */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: #27272a;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: #16161a;
+}
+
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+.scroll-bar .thumb {
+    -fx-background-color: #3f3f46;
+    -fx-background-radius: 4;
+}
+.scroll-bar .thumb:hover {
+    -fx-background-color: #52525b;
+}
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+.scroll-bar .increment-button, .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
+.scroll-bar .increment-arrow, .scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-box-border: transparent;
+    -fx-padding: 0;
+}
+.split-pane > .split-pane-divider {
+    -fx-background-color: #27272a;
+    -fx-padding: 0 1 0 1;
+}
+
+.dark-input {
+    -fx-background-color: #1f1f23;
+    -fx-text-fill: #f8fafc;
+    -fx-prompt-text-fill: #71717a;
+    -fx-border-color: #3f3f46;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 7 10 7 10;
+}
+.dark-input:focused {
+    -fx-border-color: #f59e0b;
 }
