@@ -1,45 +1,38 @@
-// ImportedBatch — наследник класса Batch, представляющий импортную партию.
-// Он наследует основные поля партии и добавляет два новых: страну и таможенный код.
-//  Метод validate() сначала проверяет поля базовой партии через super.validate(),
-// а затем дополнительно проверяет страну и таможенный код.
-
 package ru.nstu.labs.core.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serial;
 import java.time.LocalDate;
 import java.util.List;
 
 public class ImportedBatch extends Batch {
+
+  @Serial
+  private static final long serialVersionUID = 1L;
+
   private String country;
   private String customsCode;
 
+  @JsonCreator
   public ImportedBatch(
-      String sku,
-      String name,
-      int quantity,
-      String cell,
-      LocalDate deliveryDate,
-      String country,
-      String customsCode) {
+      @JsonProperty("sku") String sku,
+      @JsonProperty("name") String name,
+      @JsonProperty("quantity") int quantity,
+      @JsonProperty("cell") String cell,
+      @JsonProperty("deliveryDate") LocalDate deliveryDate,
+      @JsonProperty("country") String country,
+      @JsonProperty("customsCode") String customsCode) {
     super(sku, name, quantity, cell, deliveryDate);
     this.country = country;
     this.customsCode = customsCode;
   }
 
-  public String getCountry() {
-    return country;
-  }
+  public String getCountry() { return country; }
+  public void setCountry(String country) { this.country = country; }
 
-  public void setCountry(String country) {
-    this.country = country;
-  }
-
-  public String getCustomsCode() {
-    return customsCode;
-  }
-
-  public void setCustomsCode(String customsCode) {
-    this.customsCode = customsCode;
-  }
+  public String getCustomsCode() { return customsCode; }
+  public void setCustomsCode(String customsCode) { this.customsCode = customsCode; }
 
   @Override
   public List<String> validate() {

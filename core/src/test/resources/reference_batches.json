@@ -1,0 +1,28 @@
+{
+  "version" : 1,
+  "capacity" : 16,
+  "items" : [ {
+    "@type" : "BATCH",
+    "sku" : "SKU-REF-001",
+    "name" : "Клавиатура механическая",
+    "quantity" : 50,
+    "cell" : "A-01",
+    "deliveryDate" : "2026-09-20"
+  }, {
+    "@type" : "ARCHIVED",
+    "sku" : "SKU-REF-002",
+    "name" : "Старая клавиатура",
+    "quantity" : 10,
+    "cell" : "C-01",
+    "deliveryDate" : "2025-05-10"
+  }, {
+    "@type" : "IMPORTED",
+    "sku" : "SKU-REF-003",
+    "name" : "Монитор 24 дюйма",
+    "quantity" : 30,
+    "cell" : "B-01",
+    "deliveryDate" : "2026-09-22",
+    "country" : "Китай",
+    "customsCode" : "8471607000"
+  } ]
+}

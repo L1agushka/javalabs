@@ -1,0 +1,7 @@
+{
+  "version" : 1,
+  "capacity" : 16,
+  "items" : [ {
+    "@type" : "BATCH",
+    "sku" : "SKU-BROKEN",
+    "name" : "Поломанная запись не закрытая
