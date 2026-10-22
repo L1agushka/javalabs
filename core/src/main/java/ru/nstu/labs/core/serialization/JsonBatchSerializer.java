@@ -1,3 +1,9 @@
+//тут мы реализуем наш Serializer для формата JSON через джексон йоу
+//сейв создает папки (если их нет пишет сторейдждата в .json файл с отступами)
+//лоад проверяет, что файл ряльно существует и он не пустой 
+//лоад потом читает JSON в storagedata и чекает версию
+//Если джейсончик сломан бросает в CORRUPTED_FILE, если версия не поддерживается бросает в UNSUPPORTED_VERSION, если файл пустой бросает в EMPTY_FILE
+
 package ru.nstu.labs.core.serialization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

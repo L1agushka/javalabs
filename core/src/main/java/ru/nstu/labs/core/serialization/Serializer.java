@@ -1,3 +1,11 @@
+//Возвращает json или bin с помощью format
+//возвращает название формата для диалогов description
+//записываем данные в файл save
+//читаем данные из файла load
+//сам интерфейс просто задает правила для двух классов
+
+
+
 package ru.nstu.labs.core.serialization;
 
 import java.io.IOException;
