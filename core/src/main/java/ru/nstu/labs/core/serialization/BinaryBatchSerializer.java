@@ -1,5 +1,5 @@
 //реализуем тут Serializer для бинарного форматика через ObjectOutputStream и ObjectInputStream 
-//save записывет объект StorageData ПОТОКОМ БАЙтов (WriteObject)
+//save записывет объект StorageData ПОТОКОМ БАЙтов (WriteObject))
 //load проверяет на пустоту как всегда, читает объект и версию чекает 
 
 
