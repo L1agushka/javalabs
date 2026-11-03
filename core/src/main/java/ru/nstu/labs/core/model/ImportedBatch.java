@@ -8,8 +8,7 @@ import java.util.List;
 
 public class ImportedBatch extends Batch {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
   private String country;
   private String customsCode;
@@ -22,17 +21,40 @@ public class ImportedBatch extends Batch {
       @JsonProperty("cell") String cell,
       @JsonProperty("deliveryDate") LocalDate deliveryDate,
       @JsonProperty("country") String country,
-      @JsonProperty("customsCode") String customsCode) {
-    super(sku, name, quantity, cell, deliveryDate);
+      @JsonProperty("customsCode") String customsCode,
+      @JsonProperty("note") String note,
+      @JsonProperty("lastUpdated") LocalDate lastUpdated) {
+    super(sku, name, quantity, cell, deliveryDate, note, lastUpdated);
     this.country = country;
     this.customsCode = customsCode;
   }
 
-  public String getCountry() { return country; }
-  public void setCountry(String country) { this.country = country; }
+  public ImportedBatch(
+      String sku,
+      String name,
+      int quantity,
+      String cell,
+      LocalDate deliveryDate,
+      String country,
+      String customsCode) {
+    this(sku, name, quantity, cell, deliveryDate, country, customsCode, null, null);
+  }
 
-  public String getCustomsCode() { return customsCode; }
-  public void setCustomsCode(String customsCode) { this.customsCode = customsCode; }
+  public String getCountry() {
+    return country;
+  }
+
+  public void setCountry(String country) {
+    this.country = country;
+  }
+
+  public String getCustomsCode() {
+    return customsCode;
+  }
+
+  public void setCustomsCode(String customsCode) {
+    this.customsCode = customsCode;
+  }
 
   @Override
   public List<String> validate() {

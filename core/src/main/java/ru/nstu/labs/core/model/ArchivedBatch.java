@@ -7,8 +7,7 @@ import java.time.LocalDate;
 
 public final class ArchivedBatch extends Batch {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
   @JsonCreator
   public ArchivedBatch(
@@ -16,8 +15,14 @@ public final class ArchivedBatch extends Batch {
       @JsonProperty("name") String name,
       @JsonProperty("quantity") int quantity,
       @JsonProperty("cell") String cell,
-      @JsonProperty("deliveryDate") LocalDate deliveryDate) {
-    super(sku, name, quantity, cell, deliveryDate);
+      @JsonProperty("deliveryDate") LocalDate deliveryDate,
+      @JsonProperty("note") String note,
+      @JsonProperty("lastUpdated") LocalDate lastUpdated) {
+    super(sku, name, quantity, cell, deliveryDate, note, lastUpdated);
+  }
+
+  public ArchivedBatch(String sku, String name, int quantity, String cell, LocalDate deliveryDate) {
+    this(sku, name, quantity, cell, deliveryDate, null, null);
   }
 
   @Override
@@ -42,6 +47,16 @@ public final class ArchivedBatch extends Batch {
 
   @Override
   public void setDeliveryDate(LocalDate deliveryDate) {
+    throw new UnsupportedOperationException("Редактирование архивной партии запрещено");
+  }
+
+  @Override
+  public void setNote(String note) {
+    throw new UnsupportedOperationException("Редактирование архивной партии запрещено");
+  }
+
+  @Override
+  public void setLastUpdated(LocalDate lastUpdated) {
     throw new UnsupportedOperationException("Редактирование архивной партии запрещено");
   }
 }

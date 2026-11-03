@@ -15,17 +15,15 @@ import java.util.Objects;
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
     property = "@type",
-    defaultImpl = Batch.class
-)
+    defaultImpl = Batch.class)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = Batch.class, name = "BATCH"),
-    @JsonSubTypes.Type(value = ArchivedBatch.class, name = "ARCHIVED"),
-    @JsonSubTypes.Type(value = ImportedBatch.class, name = "IMPORTED")
+  @JsonSubTypes.Type(value = Batch.class, name = "BATCH"),
+  @JsonSubTypes.Type(value = ArchivedBatch.class, name = "ARCHIVED"),
+  @JsonSubTypes.Type(value = ImportedBatch.class, name = "IMPORTED")
 })
 public class Batch implements Editable, Serializable {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
 
   protected String sku;
   protected String name;
@@ -33,34 +31,95 @@ public class Batch implements Editable, Serializable {
   protected String cell;
   protected LocalDate deliveryDate;
 
+  /** Заметка кладовщика; добавлена в схеме v2. */
+  protected String note;
+
+  /** Дата последней актуализации карточки; добавлена в схеме v3. */
+  protected LocalDate lastUpdated;
+
   @JsonCreator
   public Batch(
       @JsonProperty("sku") String sku,
       @JsonProperty("name") String name,
       @JsonProperty("quantity") int quantity,
       @JsonProperty("cell") String cell,
-      @JsonProperty("deliveryDate") LocalDate deliveryDate) {
+      @JsonProperty("deliveryDate") LocalDate deliveryDate,
+      @JsonProperty("note") String note,
+      @JsonProperty("lastUpdated") LocalDate lastUpdated) {
     this.sku = sku;
     this.name = name;
     this.quantity = quantity;
     this.cell = cell;
     this.deliveryDate = deliveryDate;
+    this.note = note;
+    this.lastUpdated = lastUpdated;
   }
 
-  public String getSku() { return sku; }
-  public void setSku(String sku) { this.sku = sku; }
+  public Batch(String sku, String name, int quantity, String cell, LocalDate deliveryDate) {
+    this(sku, name, quantity, cell, deliveryDate, null, null);
+  }
 
-  public String getName() { return name; }
-  public void setName(String name) { this.name = name; }
+  public String getSku() {
+    return sku;
+  }
 
-  public int getQuantity() { return quantity; }
-  public void setQuantity(int quantity) { this.quantity = quantity; }
+  public void setSku(String sku) {
+    this.sku = sku;
+  }
 
-  public String getCell() { return cell; }
-  public void setCell(String cell) { this.cell = cell; }
+  public String getName() {
+    return name;
+  }
 
-  public LocalDate getDeliveryDate() { return deliveryDate; }
-  public void setDeliveryDate(LocalDate deliveryDate) { this.deliveryDate = deliveryDate; }
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public int getQuantity() {
+    return quantity;
+  }
+
+  public void setQuantity(int quantity) {
+    this.quantity = quantity;
+  }
+
+  public String getCell() {
+    return cell;
+  }
+
+  public void setCell(String cell) {
+    this.cell = cell;
+  }
+
+  public LocalDate getDeliveryDate() {
+    return deliveryDate;
+  }
+
+  public void setDeliveryDate(LocalDate deliveryDate) {
+    this.deliveryDate = deliveryDate;
+  }
+
+  public String getNote() {
+    return note;
+  }
+
+  public void setNote(String note) {
+    this.note = note;
+  }
+
+  public LocalDate getLastUpdated() {
+    return lastUpdated;
+  }
+
+  public void setLastUpdated(LocalDate lastUpdated) {
+    this.lastUpdated = lastUpdated;
+  }
+
+  /** Служебный метод мигратора: не является пользовательским редактированием. */
+  public void applyMigrationDefaults(String migratedNote, LocalDate migratedLastUpdated) {
+    if (note == null) note = migratedNote;
+    if (lastUpdated == null) lastUpdated = migratedLastUpdated;
+  }
 
   @Override
   public List<String> validate() {
@@ -87,6 +146,16 @@ public class Batch implements Editable, Serializable {
 
   @Override
   public String toString() {
-    return "Batch{sku='" + sku + "', name='" + name + "', quantity=" + quantity + ", cell='" + cell + "', deliveryDate=" + deliveryDate + "}";
+    return "Batch{sku='"
+        + sku
+        + "', name='"
+        + name
+        + "', quantity="
+        + quantity
+        + ", cell='"
+        + cell
+        + "', deliveryDate="
+        + deliveryDate
+        + "}";
   }
 }

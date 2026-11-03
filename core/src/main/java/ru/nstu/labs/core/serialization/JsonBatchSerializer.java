@@ -10,6 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -40,17 +42,35 @@ public class JsonBatchSerializer implements Serializer<StorageData> {
 
   @Override
   public void save(StorageData data, Path file) throws SerializationException, IOException {
+    save(data, file, StorageData.CURRENT_VERSION);
+  }
+
+  @Override
+  public void save(StorageData data, Path file, int targetVersion)
+      throws SerializationException, IOException {
     if (data == null) {
-      throw new SerializationException(SerializationErrorCode.SERIALIZATION_FAILED, "Данные не могут быть null");
+      throw new SerializationException(
+          SerializationErrorCode.SERIALIZATION_FAILED, "Данные не могут быть null");
     }
     if (file.getParent() != null) {
       Files.createDirectories(file.getParent());
     }
     try {
-      mapper.writeValue(file.toFile(), data);
+      StorageData downgraded = data.downgradeTo(targetVersion);
+      ObjectNode root = mapper.valueToTree(downgraded);
+      ArrayNode items = (ArrayNode) root.path("items");
+      for (var item : items) {
+        if (item instanceof ObjectNode record) {
+          if (targetVersion < 2) record.remove("note");
+          if (targetVersion < 3) record.remove("lastUpdated");
+        }
+      }
+      mapper.writeValue(file.toFile(), root);
     } catch (JsonProcessingException e) {
       throw new SerializationException(
-          SerializationErrorCode.SERIALIZATION_FAILED, "Ошибка сериализации JSON: " + e.getMessage(), e);
+          SerializationErrorCode.SERIALIZATION_FAILED,
+          "Ошибка сериализации JSON: " + e.getMessage(),
+          e);
     }
   }
 
@@ -68,15 +88,31 @@ public class JsonBatchSerializer implements Serializer<StorageData> {
         throw new SerializationException(
             SerializationErrorCode.EMPTY_FILE, "Файл не содержит валидного JSON-объекта: " + file);
       }
-      if (data.getVersion() > StorageData.CURRENT_VERSION || data.getVersion() <= 0) {
-        throw new SerializationException(
-            SerializationErrorCode.UNSUPPORTED_VERSION,
-            "Версия формата " + data.getVersion() + " не поддерживается (текущая: " + StorageData.CURRENT_VERSION + ")");
-      }
-      return data;
+      return StorageMigrator.migrate(data);
     } catch (JsonProcessingException e) {
       throw new SerializationException(
-          SerializationErrorCode.CORRUPTED_FILE, "Некорректная структура JSON: " + e.getMessage(), e);
+          SerializationErrorCode.CORRUPTED_FILE,
+          "Некорректная структура JSON: " + e.getMessage(),
+          e);
+    }
+  }
+
+  @Override
+  public int readVersion(Path file) throws SerializationException, IOException {
+    if (!Files.exists(file)) throw new FileNotFoundException("Файл не найден: " + file);
+    try {
+      var node = mapper.readTree(file.toFile());
+      if (node == null || !node.isObject())
+        throw new SerializationException(
+            SerializationErrorCode.CORRUPTED_FILE, "JSON должен содержать объект данных");
+      return node.has("schema_version")
+          ? node.get("schema_version").asInt()
+          : node.path("version").asInt(1);
+    } catch (JsonProcessingException e) {
+      throw new SerializationException(
+          SerializationErrorCode.CORRUPTED_FILE,
+          "Некорректная структура JSON: " + e.getMessage(),
+          e);
     }
   }
 }

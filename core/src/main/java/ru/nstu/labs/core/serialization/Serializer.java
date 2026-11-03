@@ -13,7 +13,19 @@ import java.nio.file.Path;
 
 public interface Serializer<T> {
   String format();
+
   String description();
+
   void save(T data, Path file) throws SerializationException, IOException;
+
+  default void save(T data, Path file, int targetVersion)
+      throws SerializationException, IOException {
+    if (targetVersion != StorageData.CURRENT_VERSION)
+      throw new UnsupportedOperationException("Экспорт в указанную версию не поддерживается");
+    save(data, file);
+  }
+
   T load(Path file) throws SerializationException, IOException;
+
+  int readVersion(Path file) throws SerializationException, IOException;
 }

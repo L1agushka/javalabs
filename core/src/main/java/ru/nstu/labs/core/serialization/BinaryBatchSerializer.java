@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class BinaryBatchSerializer implements Serializer<StorageData> {
+  private static final int MAGIC = 0x4A4C4142; // JLAB
 
   @Override
   public String format() {
@@ -23,17 +24,31 @@ public class BinaryBatchSerializer implements Serializer<StorageData> {
 
   @Override
   public void save(StorageData data, Path file) throws SerializationException, IOException {
+    save(data, file, StorageData.CURRENT_VERSION);
+  }
+
+  @Override
+  public void save(StorageData data, Path file, int targetVersion)
+      throws SerializationException, IOException {
     if (data == null) {
-      throw new SerializationException(SerializationErrorCode.SERIALIZATION_FAILED, "Данные не могут быть null");
+      throw new SerializationException(
+          SerializationErrorCode.SERIALIZATION_FAILED, "Данные не могут быть null");
     }
     if (file.getParent() != null) {
       Files.createDirectories(file.getParent());
     }
-    try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
-      oos.writeObject(data);
+    try (DataOutputStream header =
+        new DataOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
+      header.writeInt(MAGIC);
+      header.writeInt(targetVersion);
+      try (ObjectOutputStream oos = new ObjectOutputStream(header)) {
+        oos.writeObject(data.downgradeTo(targetVersion));
+      }
     } catch (IOException e) {
       throw new SerializationException(
-          SerializationErrorCode.SERIALIZATION_FAILED, "Ошибка записи бинарного файла: " + e.getMessage(), e);
+          SerializationErrorCode.SERIALIZATION_FAILED,
+          "Ошибка записи бинарного файла: " + e.getMessage(),
+          e);
     }
   }
 
@@ -45,24 +60,53 @@ public class BinaryBatchSerializer implements Serializer<StorageData> {
     if (Files.size(file) == 0) {
       throw new SerializationException(SerializationErrorCode.EMPTY_FILE, "Файл пуст: " + file);
     }
-    try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(Files.newInputStream(file)))) {
-      Object obj = ois.readObject();
-      if (!(obj instanceof StorageData data)) {
-        throw new SerializationException(
-            SerializationErrorCode.CORRUPTED_FILE,
-            "Неожиданный класс в файле: " + (obj != null ? obj.getClass().getName() : "null"));
+    try (BufferedInputStream raw = new BufferedInputStream(Files.newInputStream(file))) {
+      raw.mark(8);
+      DataInputStream header = new DataInputStream(raw);
+      int magic = header.readInt();
+      int headerVersion;
+      if (magic == MAGIC) headerVersion = header.readInt();
+      else {
+        raw.reset();
+        headerVersion = 1;
       }
-      if (data.getVersion() > StorageData.CURRENT_VERSION || data.getVersion() <= 0) {
-        throw new SerializationException(
-            SerializationErrorCode.UNSUPPORTED_VERSION,
-            "Версия формата " + data.getVersion() + " не поддерживается (текущая: " + StorageData.CURRENT_VERSION + ")");
+      try (ObjectInputStream ois = new ObjectInputStream(raw)) {
+        Object obj = ois.readObject();
+        if (!(obj instanceof StorageData data)) {
+          throw new SerializationException(
+              SerializationErrorCode.CORRUPTED_FILE,
+              "Неожиданный класс в файле: " + (obj != null ? obj.getClass().getName() : "null"));
+        }
+        if (headerVersion != data.getVersion())
+          throw new SerializationException(
+              SerializationErrorCode.CORRUPTED_FILE, "Версия в заголовке не совпадает с данными");
+        return StorageMigrator.migrate(data);
       }
-      return data;
-    } catch (ClassNotFoundException | InvalidClassException | StreamCorruptedException | OptionalDataException e) {
+    } catch (ClassNotFoundException
+        | InvalidClassException
+        | StreamCorruptedException
+        | OptionalDataException e) {
       throw new SerializationException(
-          SerializationErrorCode.CORRUPTED_FILE, "Бинарный поток поврежден или несовместим: " + e.getMessage(), e);
+          SerializationErrorCode.CORRUPTED_FILE,
+          "Бинарный поток поврежден или несовместим: " + e.getMessage(),
+          e);
     } catch (EOFException e) {
-      throw new SerializationException(SerializationErrorCode.CORRUPTED_FILE, "Неожиданный конец бинарного файла", e);
+      throw new SerializationException(
+          SerializationErrorCode.CORRUPTED_FILE, "Неожиданный конец бинарного файла", e);
     }
+  }
+
+  @Override
+  public int readVersion(Path file) throws SerializationException, IOException {
+    if (!Files.exists(file)) throw new FileNotFoundException("Файл не найден: " + file);
+    if (Files.size(file) < 4)
+      throw new SerializationException(
+          SerializationErrorCode.CORRUPTED_FILE, "Бинарный файл слишком короткий");
+    try (DataInputStream in =
+        new DataInputStream(new BufferedInputStream(Files.newInputStream(file)))) {
+      int magic = in.readInt();
+      if (magic == MAGIC) return in.readInt();
+    }
+    return 1; // бинарные файлы ЛР3 не имели заголовка
   }
 }

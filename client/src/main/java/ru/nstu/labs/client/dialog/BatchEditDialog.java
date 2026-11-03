@@ -25,6 +25,7 @@ public class BatchEditDialog extends Dialog<Batch> {
   private final ComboBox<String> typeBox = new ComboBox<>();
   private final TextField countryField = new TextField();
   private final TextField customsCodeField = new TextField();
+  private final TextField noteField = new TextField();
 
   public BatchEditDialog(
       Batch existing) { // конструктор принимает параметр Batch existing если передан нул диалог
@@ -71,6 +72,8 @@ public class BatchEditDialog extends Dialog<Batch> {
     grid.add(countryField, 1, 6);
     grid.add(new Label("Таможенный код:"), 0, 7);
     grid.add(customsCodeField, 1, 7);
+    grid.add(new Label("Заметка:"), 0, 8);
+    grid.add(noteField, 1, 8);
     // предзаполнение формы в режиме редактирования
     if (existing != null) {
       typeBox.setDisable(true); // запрещает менять тип уже сущ. партии
@@ -82,6 +85,7 @@ public class BatchEditDialog extends Dialog<Batch> {
       quantityField.setText(String.valueOf(existing.getQuantity()));
       cellField.setText(existing.getCell());
       datePicker.setValue(existing.getDeliveryDate());
+      noteField.setText(existing.getNote());
 
       if (existing
           instanceof
@@ -122,7 +126,9 @@ public class BatchEditDialog extends Dialog<Batch> {
                       cellField.getText().trim(),
                       datePicker.getValue(),
                       countryField.getText().trim(),
-                      customsCodeField.getText().trim());
+                      customsCodeField.getText().trim(),
+                      noteField.getText().trim(),
+                      LocalDate.now());
             } else {
               batch =
                   new Batch(
@@ -130,7 +136,9 @@ public class BatchEditDialog extends Dialog<Batch> {
                       nameField.getText().trim(),
                       qty,
                       cellField.getText().trim(),
-                      datePicker.getValue());
+                      datePicker.getValue(),
+                      noteField.getText().trim(),
+                      LocalDate.now());
             }
 
             List<String> errors = batch.validate(); // валидация на пустые строки итд

@@ -20,8 +20,7 @@ import ru.nstu.labs.core.model.ImportedBatch;
 @DisplayName("Тестирование сериализации и десериализации (JSON и Binary)")
 class SerializerTest {
 
-  @TempDir
-  Path tempDir;
+  @TempDir Path tempDir;
 
   private JsonBatchSerializer jsonSerializer;
   private BinaryBatchSerializer binarySerializer;
@@ -33,8 +32,17 @@ class SerializerTest {
     binarySerializer = new BinaryBatchSerializer();
 
     Batch b1 = new Batch("SKU-100", "Гайка М8", 500, "A-1", LocalDate.of(2026, 9, 15));
-    ArchivedBatch b2 = new ArchivedBatch("SKU-200", "Старый болт", 20, "C-9", LocalDate.of(2024, 1, 10));
-    ImportedBatch b3 = new ImportedBatch("SKU-300", "Контроллер", 15, "B-3", LocalDate.of(2026, 9, 20), "Германия", "8504403000");
+    ArchivedBatch b2 =
+        new ArchivedBatch("SKU-200", "Старый болт", 20, "C-9", LocalDate.of(2024, 1, 10));
+    ImportedBatch b3 =
+        new ImportedBatch(
+            "SKU-300",
+            "Контроллер",
+            15,
+            "B-3",
+            LocalDate.of(2026, 9, 20),
+            "Германия",
+            "8504403000");
 
     sampleData = new StorageData(64, List.of(b1, b2, b3));
   }
@@ -71,7 +79,8 @@ class SerializerTest {
   }
 
   @Test
-  @DisplayName("3. Позитивный сценарий: Полиморфизм и Read-Only поведение сохраняются после сериализации")
+  @DisplayName(
+      "3. Позитивный сценарий: Полиморфизм и Read-Only поведение сохраняются после сериализации")
   void test3_polymorphismAndBehaviorPreserved() throws Exception {
     Path file = tempDir.resolve("polymorphism.json");
     jsonSerializer.save(sampleData, file);
@@ -104,7 +113,7 @@ class SerializerTest {
     StorageData loaded = jsonSerializer.load(file);
 
     assertNotNull(loaded);
-    assertEquals(1, loaded.getVersion());
+    assertEquals(StorageData.CURRENT_VERSION, loaded.getVersion());
     assertEquals(16, loaded.getCapacity());
     assertEquals(3, loaded.getItems().size());
     assertEquals("SKU-REF-001", loaded.getItems().get(0).getSku());
@@ -124,27 +133,33 @@ class SerializerTest {
   }
 
   @Test
-  @DisplayName("6. Негативный сценарий: Битый синтаксис JSON вызывает SerializationException (CORRUPTED_FILE)")
+  @DisplayName(
+      "6. Негативный сценарий: Битый синтаксис JSON вызывает SerializationException (CORRUPTED_FILE)")
   void test6_corruptedJsonThrowsSerializationException() throws Exception {
     Path file = copyResourceToTemp("/corrupted_syntax.json", "broken.json");
-    SerializationException ex = assertThrows(SerializationException.class, () -> jsonSerializer.load(file));
+    SerializationException ex =
+        assertThrows(SerializationException.class, () -> jsonSerializer.load(file));
     assertEquals(SerializationErrorCode.CORRUPTED_FILE, ex.getErrorCode());
   }
 
   @Test
-  @DisplayName("7. Негативный сценарий: Поврежденный бинарный поток вызывает SerializationException (CORRUPTED_FILE)")
+  @DisplayName(
+      "7. Негативный сценарий: Поврежденный бинарный поток вызывает SerializationException (CORRUPTED_FILE)")
   void test7_corruptedBinaryThrowsSerializationException() throws Exception {
     Path file = copyResourceToTemp("/corrupted_binary.bin", "broken.bin");
-    SerializationException ex = assertThrows(SerializationException.class, () -> binarySerializer.load(file));
+    SerializationException ex =
+        assertThrows(SerializationException.class, () -> binarySerializer.load(file));
     assertEquals(SerializationErrorCode.CORRUPTED_FILE, ex.getErrorCode());
   }
 
   @Test
-  @DisplayName("8. Негативный сценарий: Неподдерживаемая версия формата вызывает UNSUPPORTED_VERSION")
+  @DisplayName(
+      "8. Негативный сценарий: Неподдерживаемая версия формата вызывает UNSUPPORTED_VERSION")
   void test8_unsupportedVersionThrowsSerializationException() throws Exception {
     Path file = copyResourceToTemp("/unsupported_version.json", "version_999.json");
-    SerializationException ex = assertThrows(SerializationException.class, () -> jsonSerializer.load(file));
-    assertEquals(SerializationErrorCode.UNSUPPORTED_VERSION, ex.getErrorCode());
+    SerializationException ex =
+        assertThrows(SerializationException.class, () -> jsonSerializer.load(file));
+    assertEquals(SerializationErrorCode.VERSION_TOO_NEW, ex.getErrorCode());
   }
 
   @Test
@@ -153,10 +168,12 @@ class SerializerTest {
     Path emptyFile = tempDir.resolve("truly_empty.json");
     Files.createFile(emptyFile);
 
-    SerializationException exJson = assertThrows(SerializationException.class, () -> jsonSerializer.load(emptyFile));
+    SerializationException exJson =
+        assertThrows(SerializationException.class, () -> jsonSerializer.load(emptyFile));
     assertEquals(SerializationErrorCode.EMPTY_FILE, exJson.getErrorCode());
 
-    SerializationException exBin = assertThrows(SerializationException.class, () -> binarySerializer.load(emptyFile));
+    SerializationException exBin =
+        assertThrows(SerializationException.class, () -> binarySerializer.load(emptyFile));
     assertEquals(SerializationErrorCode.EMPTY_FILE, exBin.getErrorCode());
   }
 
